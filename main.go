@@ -4,13 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/extractings/gym-webapp/internal"
-	"github.com/extractings/gym-webapp/internal/api"
-	"github.com/extractings/gym-webapp/store"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+
+	Workout "github.com/extractings/gym-webapp/Workouts"
+	controllers "github.com/extractings/gym-webapp/controllers/Users"
+	"github.com/extractings/gym-webapp/internal"
+	"github.com/extractings/gym-webapp/internal/api"
+	"github.com/extractings/gym-webapp/store"
 
 	"github.com/gorilla/mux"
 	"github.com/lib/pq"
@@ -53,18 +56,19 @@ func main() {
 	}
 
 	// Handlers
-	server.AddRoute("/login", handleLogin(db), http.MethodPost, defaultMiddleware...)
-	server.AddRoute("/logout", handleLogout(), http.MethodGet, defaultMiddleware...)
+	server.AddRoute("/login", controllers.HandleLogin(db), http.MethodPost, defaultMiddleware...)
+	server.AddRoute("/logout", controllers.HandleLogout(), http.MethodGet, defaultMiddleware...)
 
 	protectedMiddleware := append(defaultMiddleware, validCookieMiddleware(db))
 	server.AddRoute("/checkSecret", checkSecret(db), http.MethodGet, protectedMiddleware...)
 
 	// Workouts
-	server.AddRoute("/workout", handlecreateNewWorkout(db), http.MethodPost, protectedMiddleware...)
-	server.AddRoute("/workout", handleListWorkouts(db), http.MethodGet, protectedMiddleware...)
-	server.AddRoute("/workout/{workout_id}", handleDeleteWorkout(db), http.MethodDelete, protectedMiddleware...)
-	server.AddRoute("/workout/{workout_id}", handleAddSet(db), http.MethodPost, protectedMiddleware...)
-	server.AddRoute("/workout/{workout_id}/{set_id}", handleUpdateSet(db), http.MethodPut, protectedMiddleware...)
+	server.AddRoute("/workout", Workout.HandlecreateNewWorkout(db), http.MethodPost, protectedMiddleware...)
+	server.AddRoute("/workout", Workout.HandleListWorkouts(db), http.MethodGet, protectedMiddleware...)
+	server.AddRoute("/workout/{workout_id}", Workout.HandleDeleteWorkout(db), http.MethodDelete, protectedMiddleware...)
+	server.AddRoute("/workout/{workout_id}", Workout.HandleAddSet(db), http.MethodPost, protectedMiddleware...)
+	// will cook in update workout function later (cannot figure out somethings)
+	// server.AddRoute("/workout/{workout_id}/{set_id}", handleUpdateSet(db), http.MethodPut, protectedMiddleware...)
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)

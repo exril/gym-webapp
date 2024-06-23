@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
+	"net/http"
+
 	"github.com/extractings/gym-webapp/internal/api"
 	"github.com/extractings/gym-webapp/store"
-	"net/http"
+	"github.com/gorilla/sessions"
 )
-
 
 type UserSession struct {
 	UserID int64
@@ -16,6 +17,18 @@ type UserSession struct {
 type ourCustomKey string
 
 const sessionKey ourCustomKey = "unique-session-key-for-our-example"
+
+var (
+	cookieStore = sessions.NewCookieStore([]byte("forDemo"))
+)
+
+func init() {
+	cookieStore.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   60 * 15,
+		HttpOnly: true,
+	}
+}
 
 func validCookieMiddleware(db *sql.DB) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
