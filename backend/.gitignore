@@ -6,5 +6,9 @@
 
 .db.env
 
+/.go.mod
+/.go.sum
+
 .vscode
 /github.com/extractings/gym-webapp
+

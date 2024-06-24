@@ -72,6 +72,7 @@ func userFromSession(req *http.Request) (UserSession, bool) {
 	session, ok := req.Context().Value(sessionKey).(UserSession)
 	if session.UserID < 1 {
 		// Shouldnt happen
+		userFromSession(&http.Request{})
 		return UserSession{}, false
 	}
 	return session, ok
