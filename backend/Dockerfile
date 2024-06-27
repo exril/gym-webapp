@@ -1,4 +1,7 @@
+# Created by OpenAi
+
 # Use an official Golang runtime as a parent image
+
 FROM golang:1.17-alpine
 
 WORKDIR /go/src/app
