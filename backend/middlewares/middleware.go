@@ -9,6 +9,7 @@ import (
 )
 
 // JSON middleware will help us only handle JSON
+//  used gpt for this tbh 
 // in and out
 func JSONMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(wr http.ResponseWriter, req *http.Request) {

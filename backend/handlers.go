@@ -7,12 +7,13 @@ import (
 	"net/http"
 
 	"github.com/extractings/gym-webapp/internal/api"
+	"github.com/extractings/gym-webapp/middlewares"
 	"github.com/extractings/gym-webapp/store"
 )
 
 func checkSecret(db *sql.DB) http.HandlerFunc {
 	return http.HandlerFunc(func(wr http.ResponseWriter, req *http.Request) {
-		userDetails, _ := userFromSession(req)
+		userDetails, _ := middlewares.UserFromSession(req)
 
 		querier := store.New(db)
 		user, err := querier.GetUser(req.Context(), userDetails.UserID)

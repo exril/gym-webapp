@@ -2,11 +2,7 @@ package middlewares
 
 import (
 	"net/http"
-
-	rstore "github.com/rbcervilla/redisstore/v8"
 )
-
-var store *rstore.RedisStore
 
 func HasBeenAuthenticated(w http.ResponseWriter, r *http.Request) bool {
 	session, _ := store.Get(r, "session_token")

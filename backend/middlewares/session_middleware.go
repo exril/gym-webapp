@@ -1,4 +1,4 @@
-package main
+package middlewares
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/extractings/gym-webapp/internal/api"
-	"github.com/extractings/gym-webapp/store"
 	"github.com/gorilla/sessions"
+	rstore "github.com/rbcervilla/redisstore/v8"
 )
 
 type UserSession struct {
@@ -20,6 +20,7 @@ const sessionKey ourCustomKey = "unique-session-key-for-our-example"
 
 var (
 	cookieStore = sessions.NewCookieStore([]byte("forDemo"))
+	store *rstore.RedisStore
 )
 
 func init() {
@@ -30,7 +31,7 @@ func init() {
 	}
 }
 
-func validCookieMiddleware(db *sql.DB) func(http.Handler) http.Handler {
+func ValidCookieMiddleware(db *sql.DB) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(wr http.ResponseWriter, req *http.Request) {
 			session, err := cookieStore.Get(req, "session-name")
@@ -68,11 +69,11 @@ func validCookieMiddleware(db *sql.DB) func(http.Handler) http.Handler {
 	}
 }
 
-func userFromSession(req *http.Request) (UserSession, bool) {
+func UserFromSession(req *http.Request) (UserSession, bool) {
 	session, ok := req.Context().Value(sessionKey).(UserSession)
 	if session.UserID < 1 {
 		// Shouldnt happen
-		userFromSession(&http.Request{})
+		UserFromSession(&http.Request{})
 		return UserSession{}, false
 	}
 	return session, ok
