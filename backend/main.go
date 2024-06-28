@@ -13,6 +13,7 @@ import (
 	controllers "github.com/extractings/gym-webapp/controllers/Users"
 	"github.com/extractings/gym-webapp/internal"
 	"github.com/extractings/gym-webapp/internal/api"
+	"github.com/extractings/gym-webapp/middlewares"
 	"github.com/extractings/gym-webapp/store"
 
 	"github.com/gorilla/mux"
@@ -46,8 +47,8 @@ func main() {
 	defer server.Stop()
 
 	defaultMiddleware := []mux.MiddlewareFunc{
-		api.JSONMiddleware,
-		api.CORSMiddleware(internal.GetAsSlice("CORS_WHITELIST",
+		middlewares.JSONMiddleware,
+		middlewares.CORSMiddleware(internal.GetAsSlice("CORS_WHITELIST",
 			[]string{
 				"http://localhost:9000",
 				"http://0.0.0.0:9000",

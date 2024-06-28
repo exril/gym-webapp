@@ -2,7 +2,7 @@ package middlewares
 
 import "net/http"
 
-func securityMiddleware(next http.Handler) http.Handler {
+func SecurityMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if sessionValid(w, r) {
 			if r.URL.Path == "/login" {
@@ -11,13 +11,13 @@ func securityMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		if hasBeenAuthenticated(w, r) {
+		if HasBeenAuthenticated(w, r) {
 			next.ServeHTTP(w, r)
 			return
 		}
 
 		//otherwise it will need to be redirected to /login
-		storeAuthenticated(w, r, false)
+		StoreAuthenticated(w, r, false)
 		http.Redirect(w, r, "/login", 307)
 	})
 }

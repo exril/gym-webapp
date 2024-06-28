@@ -8,7 +8,7 @@ import (
 
 var store *rstore.RedisStore
 
-func hasBeenAuthenticated(w http.ResponseWriter, r *http.Request) bool {
+func HasBeenAuthenticated(w http.ResponseWriter, r *http.Request) bool {
 	session, _ := store.Get(r, "session_token")
 	a, _ := session.Values["authenticated"]
 
@@ -20,7 +20,7 @@ func hasBeenAuthenticated(w http.ResponseWriter, r *http.Request) bool {
 }
 
 // storeAuthenticated to store authenticated value
-func storeAuthenticated(w http.ResponseWriter, r *http.Request, v bool) {
+func StoreAuthenticated(w http.ResponseWriter, r *http.Request, v bool) {
 	session, _ := store.Get(r, "session_token")
 
 	session.Values["authenticated"] = v
