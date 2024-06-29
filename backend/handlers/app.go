@@ -57,7 +57,7 @@ func LoadApplication() {
 	server.AddRoute("/logout", controllers.HandleLogout(), http.MethodGet, defaultMiddleware...)
 
 	// our session protected middlewares
-	protectedMiddleware := append(defaultMiddleware, middlewares.ValidCookieMiddleware(db))
+	protectedMiddleware := append(defaultMiddleware, ValidCookieMiddleware(db))
 	server.AddRoute("/checkSecret", controllers.CheckSecret(db), http.MethodGet, protectedMiddleware...)
 
 	// Workouts

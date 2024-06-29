@@ -1,4 +1,4 @@
-package middlewares
+package handlers
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/extractings/gym-webapp/internal/api"
+	"github.com/extractings/gym-webapp/store"
 	"github.com/gorilla/sessions"
-	rstore "github.com/rbcervilla/redisstore/v8"
 )
 
 type UserSession struct {
@@ -20,7 +20,6 @@ const sessionKey ourCustomKey = "unique-session-key-for-our-example"
 
 var (
 	cookieStore = sessions.NewCookieStore([]byte("forDemo"))
-	store *rstore.RedisStore
 )
 
 func init() {
@@ -48,7 +47,7 @@ func ValidCookieMiddleware(db *sql.DB) func(http.Handler) http.Handler {
 				api.JSONError(wr, http.StatusInternalServerError, "Session Error")
 				return
 			}
-
+			// checking if the credentials are right or wrong
 			if !isAuthd || userID < 1 {
 				api.JSONError(wr, http.StatusForbidden, "Bad Credentials")
 				return
@@ -73,6 +72,7 @@ func UserFromSession(req *http.Request) (UserSession, bool) {
 	session, ok := req.Context().Value(sessionKey).(UserSession)
 	if session.UserID < 1 {
 		// Shouldnt happen
+		// Session Expiration
 		UserFromSession(&http.Request{})
 		return UserSession{}, false
 	}
