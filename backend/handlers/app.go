@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +17,26 @@ import (
 )
 
 func LoadApplication() {
+	log.SetFlags(log.Lshortfile | log.Ldate | log.Lmicroseconds)
+	dbURI := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		internal.GetAsString("DB_USER", "local"),
+		internal.GetAsString("DB_PASSWORD", "asecurepassword"),
+		internal.GetAsString("DB_HOST", "localhost"),
+		internal.GetAsInt("DB_PORT", 5432),
+		internal.GetAsString("DB_NAME", "fullstackdb"),
+	)
+
+	db, err := sql.Open("postgres", dbURI)
+	if err != nil {
+		log.Fatalln("Error opening database:", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatalln("Error from database ping:", err)
+	}
+
+	CreateUserInDb(db)
+
 	server := api.NewServer(internal.GetAsInt("SERVER_PORT", 9002))
 
 	server.MustStart()
@@ -29,8 +51,6 @@ func LoadApplication() {
 			}, ","),
 		),
 	}
-
-
 
 	// Handlers
 	server.AddRoute("/login", controllers.HandleLogin(db), http.MethodPost, defaultMiddleware...)
@@ -52,14 +72,4 @@ func LoadApplication() {
 	signal.Notify(sigChan, os.Interrupt)
 	// Once received, we exit and the server is cleaned up
 	<-sigChan
-	server.Use(middlewares.BasicMiddleware())
-
-	srv := &http.Server{
-		Handler:      router,
-		Addr:         "127.0.0.1:3333",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-
-	log.Fatal(srv.ListenAndServe())
 }
